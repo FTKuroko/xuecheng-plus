@@ -1,5 +1,6 @@
 package com.xuecheng.content.api;
 
+import com.xuecheng.base.exception.ValidationGroups;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.content.model.dto.AddCourseDto;
@@ -35,7 +36,7 @@ public class CourseBaseInfoController {
 
     @ApiOperation("新增课程基础信息接口")
     @PostMapping("/course")
-    public CourseBaseInfoDto createCourseBase(@RequestBody @Validated AddCourseDto addCourseDto) {
+    public CourseBaseInfoDto createCourseBase(@RequestBody @Validated(ValidationGroups.Insert.class) AddCourseDto addCourseDto) {
         // 机构id，暂时硬编码模拟假数据
         Long companyId = 22L;
         return courseBaseInfoService.createCourseBase(companyId, addCourseDto);
