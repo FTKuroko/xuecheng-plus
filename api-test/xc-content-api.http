@@ -26,7 +26,7 @@ Content-Type: application/json
   "validDays": 365,
   "mt": "1-1",
   "st": "1-1-1",
-  "name": "测试课程",
+  "name": "",
   "pic": "",
   "teachmode": "200002",
   "users": "初级人员",

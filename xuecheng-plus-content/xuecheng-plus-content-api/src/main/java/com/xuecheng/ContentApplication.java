@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @description
  * @date 2023/5/6 11:03
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.xuecheng")
 @EnableSwagger2Doc
 public class ContentApplication {
     public static void main(String[] args) {
