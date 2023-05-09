@@ -108,8 +108,91 @@ public class TeachplanServiceImpl implements TeachplanService {
             queryWrapper.eq(TeachplanMedia::getTeachplanId, teachplanId);
             teachplanMediaMapper.delete(queryWrapper);
         }
+    }
 
+    @Override
+    @Transactional
+    public void orderByTeachplan(String moveType, Long teachplanId) {
+        // 1. 获取当前课程计划
+        Teachplan teachplan = teachplanMapper.selectById(teachplanId);
+        // 2. 获取当前课程计划层级及序号
+        Integer grade = teachplan.getGrade();
+        Integer orderby = teachplan.getOrderby();
+        // 课程 id
+        Long courseId = teachplan.getCourseId();
+        // 所属章节(父节点) id
+        Long parentid = teachplan.getParentid();
+        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+        if("moveup".equals(moveType)){
+            // 上移
+            if(grade == 1){
+                // 大章节上移
+                // 找到同课程下上一个章节
+                queryWrapper.eq(Teachplan::getCourseId, courseId)
+                        .eq(Teachplan::getGrade, grade)
+                        .lt(Teachplan::getOrderby, orderby)
+                        .orderByDesc(Teachplan::getOrderby)
+                        .last("LIMIT 1");
+                Teachplan change = teachplanMapper.selectOne(queryWrapper);
+                // 交换两个章节的顺序
+                exchangeOrderby(teachplan, change);
+            }else{
+                // 小节上移
+                // 找到同课程同章节下的上一个小节
+                queryWrapper.eq(Teachplan::getCourseId, courseId)
+                        .eq(Teachplan::getParentid, parentid)
+                        .eq(Teachplan::getGrade, grade)
+                        .lt(Teachplan::getOrderby, orderby)
+                        .orderByDesc(Teachplan::getOrderby)
+                        .last("LIMIT 1");
+                Teachplan change = teachplanMapper.selectOne(queryWrapper);
+                // 交换两个小节的顺序
+                exchangeOrderby(teachplan, change);
+            }
+        }else if("movedown".equals(moveType)){
+            // 下移
+            if(grade == 1){
+                // 大章节下移
+                // 找到同课程下的下一个章节
+                queryWrapper.eq(Teachplan::getCourseId, courseId)
+                        .eq(Teachplan::getGrade, grade)
+                        .gt(Teachplan::getOrderby, orderby)
+                        .orderByAsc(Teachplan::getOrderby)
+                        .last("LIMIT 1");
+                Teachplan change = teachplanMapper.selectOne(queryWrapper);
+                // 交换两个章节的顺序
+                exchangeOrderby(teachplan, change);
+            }else{
+                // 小节下移
+                // 找到同课程同章节下的下一个小节
+                queryWrapper.eq(Teachplan::getCourseId, courseId)
+                        .eq(Teachplan::getParentid, parentid)
+                        .eq(Teachplan::getGrade, grade)
+                        .gt(Teachplan::getOrderby, orderby)
+                        .orderByAsc(Teachplan::getOrderby)
+                        .last("LIMIT 1");
+                Teachplan change = teachplanMapper.selectOne(queryWrapper);
+                // 交换两个小节的顺序
+                exchangeOrderby(teachplan, change);
+            }
+        }
+    }
 
-
+    /**
+     * 交换两课程计划的顺序
+     * @param teachplan
+     * @param change
+     */
+    private void exchangeOrderby(Teachplan teachplan, Teachplan change){
+        if(change == null){
+            log.info("已经到头了，不能移动。");
+            return;
+        }
+        Integer orderby = teachplan.getOrderby();
+        Integer changeOrderby = change.getOrderby();
+        teachplan.setOrderby(changeOrderby);
+        change.setOrderby(orderby);
+        teachplanMapper.updateById(teachplan);
+        teachplanMapper.updateById(change);
     }
 }
