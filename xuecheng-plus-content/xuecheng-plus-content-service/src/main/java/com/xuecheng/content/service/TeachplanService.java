@@ -18,5 +18,15 @@ public interface TeachplanService {
      */
     List<TeachplanDto> findTeachplanTree(Long courseId);
 
+    /**
+     * 新增或修改课程计划
+     * @param teachplanDto
+     */
     void saveTeachplan(SaveTeachplanDto teachplanDto);
+
+    /**
+     * 根据课程计划 id 删除课程计划
+     * @param teachplanId
+     */
+    void deleteTeachplan(Long teachplanId);
 }
