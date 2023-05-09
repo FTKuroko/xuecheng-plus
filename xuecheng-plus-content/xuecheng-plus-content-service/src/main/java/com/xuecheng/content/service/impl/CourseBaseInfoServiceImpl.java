@@ -251,4 +251,5 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         lqw2.eq(CourseTeacher::getCourseId, courseId);
         courseTeacherMapper.delete(lqw2);
     }
+
 }
