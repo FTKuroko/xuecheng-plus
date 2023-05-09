@@ -5,19 +5,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
-import com.xuecheng.content.mapper.CourseBaseMapper;
-import com.xuecheng.content.mapper.CourseCategoryMapper;
-import com.xuecheng.content.mapper.CourseMarketMapper;
+import com.xuecheng.content.mapper.*;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.EditCourseDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
-import com.xuecheng.content.model.po.CourseBase;
-import com.xuecheng.content.model.po.CourseCategory;
-import com.xuecheng.content.model.po.CourseMarket;
+import com.xuecheng.content.model.po.*;
 import com.xuecheng.content.service.CourseBaseInfoService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +37,10 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     CourseCategoryMapper courseCategoryMapper;
     @Resource
     CourseMarketServiceImpl courseMarketService;
+    @Autowired
+    TeachplanMapper teachplanMapper;
+    @Autowired
+    CourseTeacherMapper courseTeacherMapper;
 
     /**
      * 课程基本信息查询
@@ -228,5 +229,26 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         // 6.有则更新，无则拷贝
         courseMarketService.saveOrUpdate(courseMarket);
         return getCourseBaseInfo(courseId);
+    }
+
+    @Override
+    @Transactional
+    public void delectCourse(Long companyId, Long courseId) {
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if(!companyId.equals(courseBase.getCompanyId())){
+            XueChengPlusException.cast("只允许删除本机构的课程!");
+        }
+        // 1. 删除课程基本信息
+        courseBaseMapper.deleteById(courseId);
+        // 2. 删除课程营销信息
+        courseMarketMapper.deleteById(courseId);
+        // 3. 删除课程计划
+        LambdaQueryWrapper<Teachplan> lqw1 = new LambdaQueryWrapper<>();
+        lqw1.eq(Teachplan::getCourseId, courseId);
+        teachplanMapper.delete(lqw1);
+        // 4. 删除课程教师信息
+        LambdaQueryWrapper<CourseTeacher> lqw2 = new LambdaQueryWrapper<>();
+        lqw2.eq(CourseTeacher::getCourseId, courseId);
+        courseTeacherMapper.delete(lqw2);
     }
 }
