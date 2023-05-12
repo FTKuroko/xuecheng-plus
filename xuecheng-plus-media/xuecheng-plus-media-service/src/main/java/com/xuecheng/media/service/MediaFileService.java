@@ -2,6 +2,7 @@ package com.xuecheng.media.service;
 
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
+import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.model.dto.UploadFileResultDto;
@@ -29,11 +30,11 @@ public interface MediaFileService {
     public PageResult<MediaFiles> queryMediaFiels(Long companyId,PageParams pageParams, QueryMediaParamsDto queryMediaParamsDto);
 
     /**
-     * 上传文件
+     * @description 上传文件的通用接口
      * @param companyId 机构id
-     * @param uploadFileParamsDto 上传文件信息
-     * @param localFilePath 文件磁盘路径
-     * @return 文件信息
+     * @param uploadFileParamsDto 文件信息
+     * @param localFilePath 文件本地路径
+     * @return UploadFileResultDto
      */
     public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath);
     /**
@@ -49,4 +50,37 @@ public interface MediaFileService {
      */
     public MediaFiles addMediaFilesToDb(Long companyId,String fileMd5,UploadFileParamsDto uploadFileParamsDto,String bucket,String objectName);
 
+    /**
+     * 检查文件是否存在
+     * @param fileMd5 文件的 md5
+     * @return
+     */
+    public RestResponse<Boolean> checkFile(String fileMd5);
+
+    /**
+     * 检查分块是否存在
+     * @param fileMd5 文件的 md5
+     * @param chunkIndex 分块序号
+     * @return
+     */
+    public RestResponse<Boolean> checkChunk(String fileMd5, int chunkIndex);
+
+    /**
+     * 上传分块
+     * @param fileMd5  文件md5
+     * @param chunk  分块序号
+     * @param localChunkFilePath  分块文件本地路径
+     * @return
+     */
+    public RestResponse uploadChunk(String fileMd5,int chunk,String localChunkFilePath);
+
+    /**
+     * 合并分块
+     * @param companyId 机构 id
+     * @param fileMd5 文件 md5
+     * @param chunkTotal 分块总和
+     * @param uploadFileParamsDto 文件信息
+     * @return
+     */
+    public RestResponse mergechunks(Long companyId,String fileMd5,int chunkTotal,UploadFileParamsDto uploadFileParamsDto);
 }
