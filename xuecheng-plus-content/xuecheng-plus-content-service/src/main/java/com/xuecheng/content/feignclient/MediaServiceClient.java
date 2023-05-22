@@ -15,7 +15,8 @@ import java.awt.*;
  * @description 媒资管理服务远程接口
  * @date 2023/5/22 20:38
  */
-@FeignClient(value = "media-api", configuration = MultipartSupportConfig.class)
+//@FeignClient(value = "media-api", configuration = MultipartSupportConfig.class, fallback = MediaServiceClientFallback.class)
+@FeignClient(value = "media-api", configuration = MultipartSupportConfig.class, fallbackFactory = MediaServiceClientFallbackFactory.class)
 public interface MediaServiceClient {
     @RequestMapping(value = "/media/upload/coursefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     String uploadFile(@RequestPart("filedata")MultipartFile upload,
