@@ -1,6 +1,7 @@
 package com.xuecheng.content.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.xuecheng.base.exception.CommonError;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.content.mapper.CourseBaseMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
@@ -16,6 +17,8 @@ import com.xuecheng.content.model.po.CoursePublishPre;
 import com.xuecheng.content.service.CourseBaseInfoService;
 import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.content.service.TeachplanService;
+import com.xuecheng.messagesdk.model.po.MqMessage;
+import com.xuecheng.messagesdk.service.MqMessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -46,6 +49,8 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     CoursePublishPreMapper coursePublishPreMapper;
     @Autowired
     CoursePublishMapper coursePublishMapper;
+    @Autowired
+    MqMessageService mqMessageService;
     /**
      * 获取课程预览信息
      * @param courseId 课程 id
@@ -143,7 +148,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         }
         // 审核状态
         String status = coursePublishPre.getStatus();
-        if("202004".equals(status)){
+        if(!"202004".equals(status)){
             XueChengPlusException.cast("课程审核通过后才能发布!");
         }
         // 1.2 本机构只允许发布本机构的课程
@@ -193,6 +198,9 @@ public class CoursePublishServiceImpl implements CoursePublishService {
      * @param courseId 课程 id
      */
     private void saveCoursePublishMessage(Long courseId){
-
+        MqMessage message = mqMessageService.addMessage("course_publish", String.valueOf(courseId), null, null);
+        if(message == null){
+            XueChengPlusException.cast(CommonError.UNKOWN_ERROR);
+        }
     }
 }
