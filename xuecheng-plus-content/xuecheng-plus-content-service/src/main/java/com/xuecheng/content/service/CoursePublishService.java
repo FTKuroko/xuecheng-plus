@@ -2,6 +2,8 @@ package com.xuecheng.content.service;
 
 import com.xuecheng.content.model.dto.CoursePreviewDto;
 
+import java.io.File;
+
 /**
  * @author Kuroko
  * @description 课程预览、发布接口
@@ -28,4 +30,18 @@ public interface CoursePublishService {
      * @param courseId  课程 id
      */
     public void publish(Long companyId, Long courseId);
+
+    /**
+     * 课程静态化
+     * @param courseId  课程 id
+     * @return
+     */
+    public File generateCourseHtml(Long courseId);
+
+    /**
+     * 上传课程静态化页面
+     * @param courseId  课程 id
+     * @param file      静态化文件
+     */
+    public void uploadCourseHtml(Long courseId, File file);
 }
