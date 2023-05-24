@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "课程公开查询接口", tags = "课程公开查询接口")
 @RestController
 @RequestMapping("/open")
-public class CourseOenController {
+public class CourseOpenController {
     @Autowired
     CoursePublishService coursePublishService;
     @GetMapping("/course/whole/{courseId}")

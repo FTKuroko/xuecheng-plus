@@ -20,7 +20,7 @@ public class SearchServiceClientFallbackFactory implements FallbackFactory<Searc
             @Override
             public Boolean add(CourseIndex courseIndex) {
                 throwable.printStackTrace();
-                log.debug("调用搜索发生熔断走降级方法，熔断异常:", throwable.getMessage());
+                log.debug("调用搜索发生熔断走降级方法，索引信息:{}，熔断异常:{}", courseIndex, throwable.getMessage());
                 return false;
             }
         };

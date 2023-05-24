@@ -119,14 +119,6 @@ public class CoursePublishTask extends MessageProcessAbstract {
             return;
         }
 
-        Boolean result = saveCourseIndex(courseId);
-        if(result){
-            // 保存第一阶段
-            mqMessageService.completedStageTwo(id);
-        }
-    }
-
-    private Boolean saveCourseIndex(Long courseId){
         // 取出课程发布信息
         CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
         // 拷贝至课程索引对象
@@ -137,6 +129,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
         if(!add){
             XueChengPlusException.cast("添加索引失败");
         }
-        return true;
+        // 保存任务第二阶段
+        mqMessageService.completedStageTwo(id);
     }
 }
