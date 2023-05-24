@@ -51,15 +51,14 @@ public class CoursePublishTask extends MessageProcessAbstract {
     @Override
     public boolean execute(MqMessage mqMessage) {
         // 获取消息的相关业务信息
-        String coureseId = mqMessage.getBusinessKey1();
-        log.debug("开始执行课程发布任务，课程 id 为:{}", coureseId);
-        long courseId = Long.parseLong(coureseId);
+        String courseId = mqMessage.getBusinessKey1();
+        log.debug("开始执行课程发布任务，课程 id 为:{}", courseId);
         // 将课程信息静态页面上传至MinIO
-        generateCourseHtml(mqMessage, courseId);
+        generateCourseHtml(mqMessage, Long.parseLong(courseId));
         // 课程缓存存储到Redis
-        saveCourseCache(mqMessage, courseId);
+        saveCourseCache(mqMessage, Long.parseLong(courseId));
         // 课程索引存储到ElasticSearch
-        saveCourseIndex(mqMessage, courseId);
+        saveCourseIndex(mqMessage, Long.parseLong(courseId));
         return true;
     }
 
@@ -83,10 +82,12 @@ public class CoursePublishTask extends MessageProcessAbstract {
         }
         //2. 生成静态化页面
         File file = coursePublishService.generateCourseHtml(courseId);
-        //3. 上传静态化页面
-        if(file!=null){
-            coursePublishService.uploadCourseHtml(courseId,file);
+        // 静态化异常
+        if(file==null){
+            XueChengPlusException.cast("课程静态化异常!");
         }
+        // 3. 上传静态化页面至 minio
+        coursePublishService.uploadCourseHtml(courseId,file);
         // 4.保存第一阶段状态
         mqMessageService.completedStageOne(id);
     }
