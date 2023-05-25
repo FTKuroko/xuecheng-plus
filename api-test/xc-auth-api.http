@@ -1,0 +1,10 @@
+### 授权码模式
+### 第一步申请授权码(浏览器请求)/oauth/authorize?client_id=c1&response_type=code&scope=all&redirect_uri=http://localhost/
+### 第二步申请令牌
+POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=authorization_code&code=u2bpd3&redirect_uri=http://localhost/
+
+### 密码模式
+POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=password&username=kuroko&password=123
+
+###校验jwt令牌
+POST {{auth_host}}/auth/oauth/check_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsieHVlY2hlbmctcGx1cyJdLCJ1c2VyX25hbWUiOiJLdXJva28iLCJzY29wZSI6WyJhbGwiXSwiZXhwIjoxNjg1MDEyNzE0LCJhdXRob3JpdGllcyI6WyJwMSJdLCJqdGkiOiJjYzIxYjQ3NS1iNTI1LTRhNTctOTM4Yi0zNTg4MzA2OWJkZmYiLCJjbGllbnRfaWQiOiJYY1dlYkFwcCJ9.1Hr5ysPuYBcxooSsOwfU85qMSlqIYPUQ0WYv7KhDtyE
