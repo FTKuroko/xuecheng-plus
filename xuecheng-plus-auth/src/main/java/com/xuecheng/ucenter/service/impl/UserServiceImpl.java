@@ -1,5 +1,6 @@
 package com.xuecheng.ucenter.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xuecheng.ucenter.mapper.XcUserMapper;
 import com.xuecheng.ucenter.model.po.XcUser;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import springfox.documentation.spring.web.json.Json;
 
 /**
  * @author Kuroko
@@ -28,10 +30,14 @@ public class UserServiceImpl implements UserDetailsService {
         if(xcUser == null){
             return null;
         }
-        // 查到了用户，封装成一个 UserDetails 对象，由 spring security 框架进行密码比对
-        // 取出正确密码
+        // 查到了用户，取出正确密码，方便后续比对
         String password = xcUser.getPassword();
-        UserDetails userDetails = User.withUsername(username).password(password).authorities("test").build();
+        // 将查询到的用户信息封装成 UserDetails 对象返回
+        // withUsername()参数传的是什么，返回的就是什么信息，如果想要扩展用户信息内容，可以存入 json 数据作为 username 内容
+        // 转 json 前需要先将敏感信息屏蔽，避免返回给前端
+        xcUser.setPassword(null);
+        String jsonString = JSON.toJSONString(xcUser);
+        UserDetails userDetails = User.withUsername(jsonString).password(password).authorities("test").build();
 
         return userDetails;
     }
