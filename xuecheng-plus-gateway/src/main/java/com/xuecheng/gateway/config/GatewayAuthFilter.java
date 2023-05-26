@@ -1,4 +1,4 @@
-package com.xuecheng.config;
+package com.xuecheng.gateway.config;
 
 import com.alibaba.fastjson.JSON;
 

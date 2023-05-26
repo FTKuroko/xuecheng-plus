@@ -84,6 +84,6 @@ Content-Type: application/json
 }
 
 ### 根据课程id查询课程基本信息(携带JWT令牌访问资源服务地址)
-GET {{content_host}}/content/course/122
+GET {{gateway_host}}/content/course/122
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsieHVlY2hlbmctcGx1cyJdLCJ1c2VyX25hbWUiOiJLdXJva28iLCJzY29wZSI6WyJhbGwiXSwiZXhwIjoxNjg1MDc4MjY2LCJhdXRob3JpdGllcyI6WyJwMSJdLCJqdGkiOiJhNGU4NDI5MC00NTgyLTRiYWMtYjQ3YS0wYjk2NDQ1ZmVmMWUiLCJjbGllbnRfaWQiOiJYY1dlYkFwcCJ9.O3WTczfIGmwB5cdN2yz8XhWgGu3xrMvZiD19cj82HMM
 
