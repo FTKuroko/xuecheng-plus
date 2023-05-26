@@ -1,4 +1,4 @@
-package com.xuecheng.content.config;
+package com.xuecheng.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,22 +8,23 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 /**
  * @author Kuroko
- * @description Token 配置
- * @date 2023/5/25 17:47
+ * @description
+ * @date 2023/5/25 19:29
  */
 @Configuration
 public class TokenConfig {
-    private String SIGNING_KEY = "mq123";
 
-    @Bean
-    public JwtAccessTokenConverter accessTokenConverter(){
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey(SIGNING_KEY);
-        return converter;
-    }
+    String SIGNING_KEY = "mq123";
 
     @Bean
     public TokenStore tokenStore() {
         return new JwtTokenStore(accessTokenConverter());
+    }
+
+    @Bean
+    public JwtAccessTokenConverter accessTokenConverter() {
+        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+        converter.setSigningKey(SIGNING_KEY);
+        return converter;
     }
 }
