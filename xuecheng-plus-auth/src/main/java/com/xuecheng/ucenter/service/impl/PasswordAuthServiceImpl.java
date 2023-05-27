@@ -30,7 +30,7 @@ public class PasswordAuthServiceImpl implements AuthService {
 
     @Override
     public XcUserExt excute(AuthParamsDto authParamsDto) {
-        // 校验验证码
+        // 1.校验验证码
         String checkcode = authParamsDto.getCheckcode();
         String checkcodekey = authParamsDto.getCheckcodekey();
         if(StringUtils.isBlank(checkcodekey) || StringUtils.isBlank(checkcode)){
@@ -41,22 +41,23 @@ public class PasswordAuthServiceImpl implements AuthService {
             throw new RuntimeException("验证码错误!");
         }
 
-        // 账号
+        // 2.从数据库中获取用户账号
         String username = authParamsDto.getUsername();
         XcUser user = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, username));
         if(user == null){
             throw new RuntimeException("账号不存在!");
         }
-        XcUserExt xcUserExt = new XcUserExt();
-        BeanUtils.copyProperties(user, xcUserExt);
-        // 校验密码
+        // 3.校验密码
         String passwordDb = user.getPassword(); // 数据库中的密码
         String passwordForm = authParamsDto.getPassword();  // 表单填写的密码
         boolean matches = passwordEncoder.matches(passwordForm, passwordDb);    // 表单密码是用户输入的，是明文形式，数据库中的密码是经过加密的，需要注入解码器进行密码校验
         if(!matches){
             throw new RuntimeException("账号或密码错误!");
         }
-        // 校验通过
+        // 4.密码正确后对数据进行封装
+        XcUserExt xcUserExt = new XcUserExt();
+        BeanUtils.copyProperties(user, xcUserExt);
+
         return xcUserExt;
     }
 }

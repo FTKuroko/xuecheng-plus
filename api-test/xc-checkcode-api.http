@@ -2,5 +2,6 @@
 POST {{checkcode_host}}/checkcode/pic
 
 ### 校验验证码
-POST {{checkcode_host}}/checkcode/verify?key=checkcode:869eb118c01344398e923db31374f7f9&code=wyjx
+POST {{checkcode_host}}/checkcode/verify?key=checkcode:81cd1de79f1c4dc2922eacf9c7d0d167&code=K18L
+
 

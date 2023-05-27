@@ -2,11 +2,9 @@ package com.xuecheng.checkcode.service.impl;
 
 import com.xuecheng.checkcode.service.CheckCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisCheckCodeStore implements CheckCodeService.CheckCodeStore {
 
     @Autowired
-    RedisTemplate redisTemplate;
+    StringRedisTemplate redisTemplate;
 
 
     @Override
