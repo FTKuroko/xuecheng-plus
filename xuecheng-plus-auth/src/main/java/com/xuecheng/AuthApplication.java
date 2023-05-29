@@ -23,4 +23,11 @@ public class AuthApplication {
         SpringApplication.run(AuthApplication.class, args);
     }
 
+    // 远程调用微服务之间时使用 Feign, 和第三方之间调用时使用 RestTemplate
+    @Bean
+    RestTemplate restTemplate(){
+        RestTemplate restTemplate = new RestTemplate(new OkHttp3ClientHttpRequestFactory());
+        return restTemplate;
+    }
+
 }
