@@ -16,11 +16,12 @@ import com.xuecheng.content.model.po.CourseBase;
 public interface CourseBaseInfoService {
     /**
      * 课程分页查询
+     * @param companyId  教学机构 id
      * @param pageParams 分页查询参数
      * @param queryCourseParamsDto 查询条件
      * @return
      */
-    public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto);
+    public PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto);
 
     /**
      * 新增课程基本信息

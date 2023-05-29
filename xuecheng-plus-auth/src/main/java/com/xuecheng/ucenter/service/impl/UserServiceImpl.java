@@ -1,9 +1,11 @@
 package com.xuecheng.ucenter.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.xuecheng.ucenter.mapper.XcMenuMapper;
 import com.xuecheng.ucenter.mapper.XcUserMapper;
 import com.xuecheng.ucenter.model.dto.AuthParamsDto;
 import com.xuecheng.ucenter.model.dto.XcUserExt;
+import com.xuecheng.ucenter.model.po.XcMenu;
 import com.xuecheng.ucenter.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Kuroko
@@ -26,6 +31,8 @@ public class UserServiceImpl implements UserDetailsService {
     XcUserMapper xcUserMapper;
     @Autowired
     ApplicationContext applicationContext;
+    @Autowired
+    XcMenuMapper xcMenuMapper;
 
     /**
      * 查询用户信息组成用户身份信息
@@ -57,13 +64,25 @@ public class UserServiceImpl implements UserDetailsService {
      * @return
      */
     public UserDetails getUserPrincipal(XcUserExt user){
-        // 用户权限
-        String[] authorities = {"test"};
+        // 查询用户权限
+        List<XcMenu> xcMenus = xcMenuMapper.selectPermissionByUserId(user.getId());
+        List<String> permissions = new ArrayList<>();
+        if(xcMenus.size() <= 0){
+            // 给定一个用户权限，如果不加的话会报 Cannot pass a null GrantedAuthority collection
+            permissions.add("p1");
+        }else {
+            xcMenus.forEach(xcMenu -> {
+                permissions.add(xcMenu.getCode());
+            });
+        }
+        // 将用户权限放在 user 中
+        user.setPermissions(permissions);
         String password = user.getPassword();
         // 令牌中不放密码
         user.setPassword(null);
         // 将 user 转为 json 对象
         String userString = JSON.toJSONString(user);
+        String[] authorities = permissions.toArray(new String[0]);
         // 封装成 UserDetails
         UserDetails userDetails = User.withUsername(userString).password(password).authorities(authorities).build();
         return userDetails;

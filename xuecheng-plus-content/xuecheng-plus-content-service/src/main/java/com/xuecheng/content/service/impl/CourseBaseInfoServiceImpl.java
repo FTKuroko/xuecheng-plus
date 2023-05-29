@@ -49,9 +49,10 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
      * @return
      */
     @Override
-    public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
+    public PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
         // 构造条件查询器
         LambdaQueryWrapper<CourseBase> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(CourseBase::getCompanyId, companyId);
         // 构建查询条件:按照课程名称模糊查询
         lqw.like(StringUtils.isNotEmpty(queryCourseParamsDto.getCourseName()), CourseBase::getName, queryCourseParamsDto.getCourseName());
         // 构建查询条件:按照课程审核状态查询
