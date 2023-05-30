@@ -4,6 +4,8 @@ import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.checkcode.model.CheckCodeParamsDto;
 import com.xuecheng.checkcode.model.CheckCodeResultDto;
 import com.xuecheng.checkcode.service.CheckCodeService;
+import com.xuecheng.checkcode.service.SendCodeService;
+import com.xuecheng.checkcode.utils.MailUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -27,6 +29,9 @@ public class CheckCodeController {
     @Resource(name = "PicCheckCodeService")
     private CheckCodeService picCheckCodeService;
 
+    @Autowired
+    SendCodeService sendCodeService;
+
 
     @ApiOperation(value="生成验证信息", notes="生成验证信息")
     @PostMapping(value = "/pic")
@@ -44,5 +49,12 @@ public class CheckCodeController {
     public Boolean verify(String key, String code){
         Boolean isSuccess = picCheckCodeService.verify(key,code);
         return isSuccess;
+    }
+
+    @ApiOperation(value = "发送邮箱验证码", tags = "发送邮箱验证码")
+    @PostMapping("/phone")  // 前端要求接受的路径是 phone
+    public void sendEmail(@RequestParam("param1")String email){
+        String code = MailUtil.achieveCode();
+        sendCodeService.sendEmail(email, code);
     }
 }

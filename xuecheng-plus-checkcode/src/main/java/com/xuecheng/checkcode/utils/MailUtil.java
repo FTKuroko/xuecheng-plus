@@ -79,7 +79,7 @@ public class MailUtil {
         return sb.substring(3, 8);
     }
 
-    public static void main(String[] args) throws MessagingException {
-        sendTestMail("982239116@qq.com", new MailUtil().achieveCode());
-    }
+//    public static void main(String[] args) throws MessagingException {
+//        sendTestMail("982239116@qq.com", new MailUtil().achieveCode());
+//    }
 }
