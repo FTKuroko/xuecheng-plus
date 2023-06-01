@@ -47,8 +47,11 @@ public class CourseBaseInfoController {
     @ApiOperation("新增课程基础信息接口")
     @PostMapping("/course")
     public CourseBaseInfoDto createCourseBase(@RequestBody @Validated(ValidationGroups.Insert.class) AddCourseDto addCourseDto) {
-        // 机构id，暂时硬编码模拟假数据
-        Long companyId = 22L;
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        Long companyId = null;
+        if(StringUtils.isNotEmpty(user.getCompanyId())){
+            companyId = Long.parseLong(user.getCompanyId());
+        }
         return courseBaseInfoService.createCourseBase(companyId, addCourseDto);
     }
 
@@ -66,14 +69,22 @@ public class CourseBaseInfoController {
     @ApiOperation("修改课程基础信息")
     @PutMapping("/course")
     public CourseBaseInfoDto modifyCourseBase(@RequestBody EditCourseDto editCourseDto){
-        Long companyId = 22L;
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        Long companyId = null;
+        if(StringUtils.isNotEmpty(user.getCompanyId())){
+            companyId = Long.parseLong(user.getCompanyId());
+        }
         return courseBaseInfoService.updateCourseBase(companyId, editCourseDto);
     }
 
     @ApiOperation("删除课程")
     @DeleteMapping("/course/{courseId}")
     public void deleteCourse(@PathVariable Long courseId) {
-        Long companyId = 1232141425L;
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        Long companyId = null;
+        if(StringUtils.isNotEmpty(user.getCompanyId())){
+            companyId = Long.parseLong(user.getCompanyId());
+        }
         courseBaseInfoService.delectCourse(companyId,courseId);
     }
 }

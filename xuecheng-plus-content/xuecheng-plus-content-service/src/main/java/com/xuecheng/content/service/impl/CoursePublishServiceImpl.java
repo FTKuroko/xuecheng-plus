@@ -272,4 +272,15 @@ public class CoursePublishServiceImpl implements CoursePublishService {
             XueChengPlusException.cast("远程调用媒资服务上传文件失败");
         }
     }
+
+    /**
+     * 查询课程发布信息
+     * @param courseId  课程 id
+     * @return
+     */
+    @Override
+    public CoursePublish getCoursePublish(Long courseId) {
+        CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+        return coursePublish;
+    }
 }
