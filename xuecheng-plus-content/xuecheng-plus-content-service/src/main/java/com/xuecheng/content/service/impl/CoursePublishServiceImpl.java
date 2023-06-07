@@ -309,20 +309,22 @@ public class CoursePublishServiceImpl implements CoursePublishService {
             coursePublish = JSON.parseObject(courseCache, CoursePublish.class);
             return coursePublish;
         }else{
-            // 2. 缓存未命中，查询数据库
-            log.debug("缓存未命中，查询数据库");
-            coursePublish = getCoursePublish(courseId);
-            // 3. 将查询到的结果存入 redis
-            // 避免缓存穿透，可以提前将空值或者特殊值存入缓存中，但是要设置一个较短的过期时间
-            if(coursePublish == null){
-                stringRedisTemplate.opsForValue().set("course:" + courseId, "null", 30 + new Random().nextInt(100), TimeUnit.SECONDS);
-                return null;
-            }
-            String jsonString = JSON.toJSONString(coursePublish);
-            // 正常数据写入缓存，指定一个较长的过期时间
-            stringRedisTemplate.opsForValue().set("course:" + courseId, jsonString, 30 + new Random().nextInt(30), TimeUnit.MINUTES);
-        }
+            synchronized (this){
+                // 2. 缓存未命中，查询数据库
+                log.debug("缓存未命中，查询数据库");
+                coursePublish = getCoursePublish(courseId);
+                // 3. 将查询到的结果存入 redis
+                // 避免缓存穿透，可以提前将空值或者特殊值存入缓存中，但是要设置一个较短的过期时间
+                if(coursePublish == null){
+                    stringRedisTemplate.opsForValue().set("course:" + courseId, "null", 30 + new Random().nextInt(100), TimeUnit.SECONDS);
+                    return null;
+                }
+                String jsonString = JSON.toJSONString(coursePublish);
+                // 正常数据写入缓存，指定一个较长的过期时间
+                stringRedisTemplate.opsForValue().set("course:" + courseId, jsonString, 30 + new Random().nextInt(30), TimeUnit.MINUTES);
 
+            }
+        }
         return coursePublish;
     }
 }
