@@ -41,6 +41,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -310,15 +311,16 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         }else{
             // 2. 缓存未命中，查询数据库
             log.debug("缓存未命中，查询数据库");
-            coursePublish = coursePublishMapper.selectById(courseId);
+            coursePublish = getCoursePublish(courseId);
             // 3. 将查询到的结果存入 redis
             // 避免缓存穿透，可以提前将空值或者特殊值存入缓存中，但是要设置一个较短的过期时间
             if(coursePublish == null){
-                stringRedisTemplate.opsForValue().set("course:" + courseId, "null", 30, TimeUnit.SECONDS);
+                stringRedisTemplate.opsForValue().set("course:" + courseId, "null", 30 + new Random().nextInt(100), TimeUnit.SECONDS);
                 return null;
             }
             String jsonString = JSON.toJSONString(coursePublish);
-            stringRedisTemplate.opsForValue().set("course:" + courseId, jsonString);
+            // 正常数据写入缓存，指定一个较长的过期时间
+            stringRedisTemplate.opsForValue().set("course:" + courseId, jsonString, 30 + new Random().nextInt(30), TimeUnit.MINUTES);
         }
 
         return coursePublish;
