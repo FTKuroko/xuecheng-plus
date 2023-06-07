@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
@@ -65,6 +66,9 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     MqMessageService mqMessageService;
     @Autowired
     MediaServiceClient mediaServiceClient;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
     /**
      * 获取课程预览信息
      * @param courseId 课程 id
@@ -281,6 +285,33 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     @Override
     public CoursePublish getCoursePublish(Long courseId) {
         CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+        return coursePublish;
+    }
+
+    /**
+     * 查询缓存中的课程发布信息
+     * @param courseId  课程 id
+     * @return
+     */
+    @Override
+    public CoursePublish getCoursePublishCache(Long courseId) {
+        // 1. 先查缓存
+        String courseCache = stringRedisTemplate.opsForValue().get("course:" + courseId);
+        CoursePublish coursePublish = new CoursePublish();
+        if(StringUtils.isNotEmpty(courseCache)){
+            // 缓存命中直接返回
+            log.debug("从缓存中取出课程发布信息:{}", courseCache);
+            coursePublish = JSON.parseObject(courseCache, CoursePublish.class);
+            return coursePublish;
+        }else{
+            // 2. 缓存未命中，查询数据库
+            log.debug("缓存未命中，查询数据库");
+            coursePublish = coursePublishMapper.selectById(courseId);
+            // 3. 将查询到的结果存入 redis
+            String jsonString = JSON.toJSONString(coursePublish);
+            stringRedisTemplate.opsForValue().set("course:" + courseId, jsonString);
+        }
+
         return coursePublish;
     }
 }
