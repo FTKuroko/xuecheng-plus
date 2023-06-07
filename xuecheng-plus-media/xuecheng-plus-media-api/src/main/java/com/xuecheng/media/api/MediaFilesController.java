@@ -8,6 +8,7 @@ import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.model.dto.UploadFileResultDto;
 import com.xuecheng.media.model.po.MediaFiles;
 import com.xuecheng.media.service.MediaFileService;
+import com.xuecheng.media.util.SecurityUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,12 @@ public class MediaFilesController {
     @ApiOperation("媒资列表查询接口")
     @PostMapping("/files")
     public PageResult<MediaFiles> list(PageParams pageParams, @RequestBody QueryMediaParamsDto queryMediaParamsDto){
-        Long companyId = 1232141425L;
-        return mediaFileService.queryMediaFiels(companyId,pageParams,queryMediaParamsDto);
+        //Long companyId = 1232141425L;
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        if(user == null){
+            XueChengPlusException.cast("请先登录!");
+        }
+        return mediaFileService.queryMediaFiels(Long.valueOf(user.getCompanyId()),pageParams,queryMediaParamsDto);
 
     }
 
@@ -45,7 +50,11 @@ public class MediaFilesController {
                                       @RequestParam(value = "folder",required=false) String folder,
                                       @RequestParam(value = "objectName",required=false) String objectName) throws IOException {
 
-        Long companyId = 1232141425L;
+        //Long companyId = 1232141425L;
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        if(user == null){
+            XueChengPlusException.cast("请先登录!");
+        }
         UploadFileParamsDto uploadFileParamsDto = new UploadFileParamsDto();
         //文件大小
         uploadFileParamsDto.setFileSize(upload.getSize());
@@ -63,7 +72,7 @@ public class MediaFilesController {
         //文件路径
         String absolutePath = tempFile.getAbsolutePath();
         //上传文件
-        UploadFileResultDto uploadFileResultDto = mediaFileService.uploadFile(companyId, uploadFileParamsDto, absolutePath, objectName);
+        UploadFileResultDto uploadFileResultDto = mediaFileService.uploadFile(Long.valueOf(user.getCompanyId()), uploadFileParamsDto, absolutePath, objectName);
 
         return uploadFileResultDto;
     }

@@ -1,8 +1,10 @@
 package com.xuecheng.media.api;
 
+import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.service.MediaFileService;
+import com.xuecheng.media.util.SecurityUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +54,17 @@ public class BigFilesController {
     @ApiOperation(value = "合并分块文件")
     @PostMapping("/upload/mergechunks")
     public RestResponse mergeChunks(@RequestParam("fileMd5") String fileMd5, @RequestParam("fileName") String fileName, @RequestParam("chunkTotal") int chunkTotal) {
-        Long companyId = 1232141425L;
+        //Long companyId = 1232141425L;
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        if(user == null){
+            XueChengPlusException.cast("请先登录!");
+        }
         UploadFileParamsDto uploadFileParamsDto = new UploadFileParamsDto();
         uploadFileParamsDto.setFileType("001002");
         uploadFileParamsDto.setTags("课程视频");
         uploadFileParamsDto.setRemark("");
         uploadFileParamsDto.setFilename(fileName);
 
-        return mediaFileService.mergechunks(companyId, fileMd5, chunkTotal, uploadFileParamsDto);
+        return mediaFileService.mergechunks(Long.valueOf(user.getCompanyId()), fileMd5, chunkTotal, uploadFileParamsDto);
     }
 }
