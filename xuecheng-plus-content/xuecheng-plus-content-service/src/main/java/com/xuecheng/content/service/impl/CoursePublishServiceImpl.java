@@ -41,6 +41,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Kuroko
@@ -301,6 +302,9 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         if(StringUtils.isNotEmpty(courseCache)){
             // 缓存命中直接返回
             log.debug("从缓存中取出课程发布信息:{}", courseCache);
+            if("null".equals(courseCache)){
+                return null;
+            }
             coursePublish = JSON.parseObject(courseCache, CoursePublish.class);
             return coursePublish;
         }else{
@@ -308,6 +312,11 @@ public class CoursePublishServiceImpl implements CoursePublishService {
             log.debug("缓存未命中，查询数据库");
             coursePublish = coursePublishMapper.selectById(courseId);
             // 3. 将查询到的结果存入 redis
+            // 避免缓存穿透，可以提前将空值或者特殊值存入缓存中，但是要设置一个较短的过期时间
+            if(coursePublish == null){
+                stringRedisTemplate.opsForValue().set("course:" + courseId, "null", 30, TimeUnit.SECONDS);
+                return null;
+            }
             String jsonString = JSON.toJSONString(coursePublish);
             stringRedisTemplate.opsForValue().set("course:" + courseId, jsonString);
         }
